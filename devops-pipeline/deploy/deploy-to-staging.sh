@@ -1,2 +1,2 @@
 #!/bin/bash
-echo "Staging deployment simulated." 
+echo "Staging deployment simulated."  
