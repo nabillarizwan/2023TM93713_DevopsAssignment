@@ -22,7 +22,7 @@ pipeline {
             agent { label 'built-in' }
             steps {
                 echo 'Deploying to staging...'
-                sh './devops-pipeline/deploy/deploy-to-staging.sh'
+                sh 'bash devops-pipeline/deploy/deploy-to-staging.sh'
             }
         }
 
