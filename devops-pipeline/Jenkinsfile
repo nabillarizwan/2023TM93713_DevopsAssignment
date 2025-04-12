@@ -1,0 +1,53 @@
+pipeline {
+    agent none
+
+    stages {
+        stage('Build') {
+            agent { label 'docker' }
+            steps {
+                echo 'Building Python code...'
+                sh 'python3 -m compileall src'
+            }
+        }
+
+        stage('Test') {
+            agent { label 'docker' }
+            steps {
+                echo 'Running unit tests...'
+                sh 'python3 -m unittest discover test || exit 1'
+            }
+        }
+
+        stage('Deploy to Staging') {
+            agent { label 'built-in' }
+            steps {
+                echo 'Deploying to staging...'
+                sh './devops-pipeline/deploy/deploy-to-staging.sh'
+            }
+        }
+
+        stage('Approval') {
+            agent { label 'built-in' }
+            steps {
+                input message: 'Approve deployment to production?', ok: 'Deploy'
+            }
+        }
+
+        stage('Deploy to Production') {
+            agent { label 'built-in' }
+            steps {
+                echo 'Deploying to production...'
+                sh './devops-pipeline/deploy/deploy-to-production.sh'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully.'
+        }
+        failure {
+            echo 'Pipeline failed. Please check logs.'
+        }
+    }
+}
